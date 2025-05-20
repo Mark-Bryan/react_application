@@ -221,22 +221,43 @@
 
 // export default Users;
 
-import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import FruitList from './Fruits'
+// import React from 'react';
+// import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// import FruitList from './Fruits'
 
-const queryClient = new QueryClient();
+// const queryClient = new QueryClient();
+
+// function App(){
+//   return(
+//     <QueryClientProvider client={queryClient}>
+//     <div>
+//       <h1>List of Fruits</h1>
+//       <FruitList/>
+//     </div>
+//   </QueryClientProvider>
+//   )
+// }
+
+// export default App;
+
+
+import React from "react";
+import Home from "./components/pages/Home";
+import About from "./components/pages/About";
+import Contact from "./components/pages/Contact";
+import Product from "./components/pages/Product";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 
 function App(){
-  return(
-    <QueryClientProvider client={queryClient}>
-    <div>
-      <h1>List of Fruits</h1>
-      <FruitList/>
-    </div>
-  </QueryClientProvider>
-  )
+  return <Router>
+    <Routes>
+      <Route path="/" element={<Home/>}/>
+      <Route path="/about" element={<About/>}/>
+      <Route path="/contact" element={<Contact/>}/>
+      <Route path="/product/:id" element={<Product/>}/>
+    </Routes>
+  </Router>;
 }
 
 export default App;
-

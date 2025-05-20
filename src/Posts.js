@@ -12,7 +12,7 @@ function Posts(){
         queryKey: ['posts'],
         queryFn: fetchPosts,
     });
-
+ 
     if (isLoading) return <p>Loading Posts...</p>;
     if (error) return <p>Error fetching posts: {error.message}</p>
 
