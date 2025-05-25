@@ -4,26 +4,28 @@ import axios from 'axios';
 
 function UserList() {
   const [users, setUsers] = useState([]);
+  const currentUser = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     async function fetchUsers() {
       try {
         const response = await axios.get('https://banyeh23.pythonanywhere.com/api/users');
-        setUsers(response.data);
+        const filteredUsers = response.data.filter(user => user.id !== currentUser?.id);
+        setUsers(filteredUsers);
       } catch (error) {
-        alert('Failed to fetch Users');
+        alert('Failed to fetch users');
       }
     }
     fetchUsers();
   }, []);
 
   return (
-    <div className="user-list">
+    <div>
       <h2>All Users</h2>
-      <ul className="user-list-items">
+      <ul>
         {users.map(user => (
-          <li key={user.id} className="user-list-item">
-            <Link to={`/users/${user.id}`} className="user-link">{user.name}</Link>
+          <li key={user.id}>
+            <Link to={`/users/${user.id}`}>{user.name}</Link>
           </li>
         ))}
       </ul>
