@@ -15,7 +15,7 @@ function Register() {
 
     try {
       const url = `https://banyeh23.pythonanywhere.com/user/create/${name}/${email}/${password}/${role}`;
-      const response = await axios.get(url, {
+      const response = await axios.post(url, {
         validateStatus: () => true
       });
 
