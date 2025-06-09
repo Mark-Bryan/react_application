@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import InputField from './Input';
+import { db } from '../../firebase';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
 
 function Questionnaire() {
@@ -15,7 +18,7 @@ function Questionnaire() {
           const data = await response.json();
           console.log(data);
           setQuestionnaire(data.data);
-          
+
           const initialValues = {};
           data.data.questions.forEach((question) => {
             question.settings.responses.forEach((resp) => {
@@ -39,10 +42,22 @@ function Questionnaire() {
     setFormValues({...formValues, [name]: value})
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Submitted values:", formValues)
-  }
+
+    try {
+        await addDoc(collection(db, "questionnaireResponses"), {
+            ...formValues, 
+            questionnaireId: id,
+            createdAt: Timestamp.now()
+        }); 
+        console.log("Form data saved to Firebase")
+        alert("Submission successful!");
+    } catch (error) {
+        console.error("Error saving to Firebase:", error);
+        alert("Error saving submission. Please try again later.");
+    }
+}
 
   if (!questionnaire) {
     return <div>Loading questionnaire...</div>;
@@ -52,72 +67,16 @@ function Questionnaire() {
     <div className='container'>
       <h2>{questionnaire.name}</h2>
       <p>{questionnaire.description}</p>
+
       <form onSubmit={handleSubmit}>
         {questionnaire.questions.map((question) => (
             <div key={question.id} className='question'>
-                {question.settings.responses.map((resp) => {
-                    let input;
-                    switch (resp.type) {
-                        case "FREE_TEXT":
-                          input = (
-                            <textarea
-                              name={resp.input_key}
-                              value={formValues[resp.input_key]}
-                              onChange={handleChange}
-                              required={resp.required}
-                              rows={3}
-                              className='input'
-                            />
-                          );
-                          break;
-                      
-                        case "DATE_TIME":
-                          input = (
-                            <input
-                              type="datetime-local"
-                              name={resp.input_key}
-                              value={formValues[resp.input_key]}
-                              onChange={handleChange}
-                              required={resp.required}
-                              className='input'
-                            />
-                          );
-                          break;
-                      
-                        case "SIMPLE_TEXT":
-                          input = (
-                            <input
-                              type="text"
-                              name={resp.input_key}
-                              value={formValues[resp.input_key]}
-                              onChange={handleChange}
-                              required={resp.required}
-                              className='input'
-                            />
-                          );
-                          break;
-                      
-                        default:
-                          input = (
-                            <input
-                              type="text"
-                              name={resp.input_key}
-                              value={formValues[resp.input_key]}
-                              onChange={handleChange}
-                              required={resp.required}
-                              className='input'
-                            />
-                          );
-                      }
-                    
-                    return (
-                        <div key={resp.input_key} style={{marginTop: '12px'}}>
-                            <label className='label'>{resp.label}</label>
-                            {input}
-                        </div>
-                    )
-                })}
+                {question.settings.responses.map((resp) => (
+                    <InputField key={resp.input_key} type={resp.type} name={resp.input_key} value={formValues[resp.input_key]} onChange={handleChange} required={resp.required} label={resp.label}/>
+                ))}
 
+
+                    
             </div>
         ))}
         <button type="submit" className='submit-btn'>Submit</button>
